@@ -1,0 +1,2 @@
+# Contributing to UPS Turkey
+Apart from minor documentation changes, the GitHub discussions page should generally be your starting point. Please only raise an issue or pull request if you've been recommended to do so after discussion.
