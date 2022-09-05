@@ -7,6 +7,7 @@ setuptools.setup(
     name="ups_turkey",
     version="1.0.0",
     author="Efraim GENC",
+    author_email='info@kavimdigital.com',
     description="Easy integration for UPS Turkey",
     license="MIT",
     keywords=["ups_turkey", "ups-turkey", "ups", "turkey", "shipment"],
