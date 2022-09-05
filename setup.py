@@ -14,6 +14,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url="https://github.com/EfraimGENC/ups-turkey",
+    download_url = 'https://github.com/EfraimGENC/ups-turkey/archive/refs/tags/v1.0.0.tar.gz',
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
