@@ -5,9 +5,13 @@ Python package for integrate UPS Turkey easily.
 
 [QueryPackageInfo](https://ws.ups.com.tr/QueryPackageInfo/wsQueryPackagesInfo.asmx)
 
+## Install
+```sh
+pip install ups-turkey
+```
 
-# Example
-## Create Shipment
+## Usage
+### Create Shipment
 ```python
 from ups_turkey import UPSService
 
@@ -67,5 +71,15 @@ shipment_info = {
     }
 }
 
-shipment = ups.CreateShipment_Type2(shipment_info)
+shipment = ups.CreateShipment_Type2(shipment_info, True, True)
+```
+
+### Get Shipment Info By Tracking Number
+
+```python
+from ups_turkey import UPSService
+
+
+ups = UPSService('CUSTOMER_NUMBER', 'USERNAME', 'PASSWORD')
+result = ups.GetShipmentInfoByTrackingNumber_V2('YOUR_TRACKING_NUMBER')
 ```
