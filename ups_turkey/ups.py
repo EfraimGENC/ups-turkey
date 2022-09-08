@@ -14,16 +14,26 @@ class UPSService:
 
     @staticmethod
     def _error_handler(response):
-        error_code = response.get('ErrorCode')
-        error_definition = response.get('ErrorDefinition')
-        if error_code != 0 and error_code is not None:
-            raise UPSException(error_code, error_definition)
+        def _handler(res):
+            error_code = res.get('ErrorCode')
+            error_definition = res.get('ErrorDefinition')
+            if error_code != 0 and error_code is not None:
+                raise UPSException(error_code, error_definition)
 
-    def get_session_id(self):
-        client = zeep.Client(self.wsdl_create)
-        result = client.service.Login_Type1(self.customer_number,
-                                            self.username,
-                                            self.password)
+        if isinstance(response, list):
+            list(map(_handler, response))
+        else:
+            _handler(response)
+
+    def get_session_id(self, query=False):
+        credentials = self.customer_number, self.username, self.password
+
+        if query:
+            client = zeep.Client(self.wsdl_query)
+            result = client.service.Login_V1(*credentials)
+        else:
+            client = zeep.Client(self.wsdl_create)
+            result = client.service.Login_Type1(*credentials)
 
         result = zeep.helpers.serialize_object(result)
 
@@ -57,7 +67,7 @@ class UPSService:
         numbers in a shipment. Any tracking number in a shipment can be sent \
         as a parameter.
         """
-        session_id = self.get_session_id()
+        session_id = self.get_session_id(True)
         client = zeep.Client(self.wsdl_query)
         result = client.service.GetShipmentInfoByTrackingNumber_V2(
             session_id, 1, tracking_number)
@@ -71,11 +81,43 @@ class UPSService:
         """
         This method return only the last transaction for a tracking number
         """
-        session_id = self.get_session_id()
+        session_id = self.get_session_id(True)
         client = zeep.Client(self.wsdl_query)
         result = client.service.GetLastTransactionByTrackingNumber_V1(
             session_id, 1, tracking_number)
         result = zeep.helpers.serialize_object(result)[0]
+
+        self._error_handler(result)
+
+        return result
+
+    def GetTransactionsByTrackingNumber_V1(self, tracking_number:str):
+        """
+        This method return only the last transaction for a tracking number
+        """
+        session_id = self.get_session_id(True)
+        client = zeep.Client(self.wsdl_query)
+        result = client.service.GetTransactionsByTrackingNumber_V1(
+            session_id, 1, tracking_number)
+        result = zeep.helpers.serialize_object(result)
+
+        self._error_handler(result)
+
+        return result
+
+    def GetUnreadTransactionsByTrackingNumber_V1(self,
+                                                 tracking_number:str,
+                                                 record_id:str):
+        """
+        This method return all transactions with RecordIds greater than the 
+        RecordId supplied as a parameter. RecordIds are returned as part of 
+        transaction information.
+        """
+        session_id = self.get_session_id(True)
+        client = zeep.Client(self.wsdl_query)
+        result = client.service.GetUnreadTransactionsByTrackingNumber_V1(
+            session_id, 1, tracking_number, record_id)
+        result = zeep.helpers.serialize_object(result)
 
         self._error_handler(result)
 
@@ -88,7 +130,7 @@ class UPSService:
         Referance type must be set. Results can be set as last transaction, \
         all transaction and delivery transaction.
         """
-        veri['SessionID'] = self.get_session_id()
+        veri['SessionID'] = self.get_session_id(True)
 
         client = zeep.Client(self.wsdl_query)
         result = client.service.GetTransactionsByList_V2(veri)

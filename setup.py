@@ -5,7 +5,7 @@ with open('README.md', 'r') as f:
 
 setuptools.setup(
     name="ups_turkey",
-    version="1.0.0-beta.3",
+    version="1.0.0-beta.4",
     author="Efraim GENC",
     author_email='info@kavimdigital.com',
     description="Easy integration for UPS Turkey",
