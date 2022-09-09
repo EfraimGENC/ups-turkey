@@ -25,117 +25,63 @@ class UPSService:
         else:
             _handler(response)
 
+    def call_service(self, service:str, query=False, *args, **kwargs):
+        if not service.startswith('Login'):
+            kwargs['SessionID'] = self.get_session_id(query)
+        wdsl = self.wsdl_query if query else self.wsdl_create
+        client = zeep.Client(wdsl)
+        result = getattr(client.service, service)(*args, **kwargs)
+        result = zeep.helpers.serialize_object(result)
+        self._error_handler(result)
+        return result
+
     def get_session_id(self, query=False):
         credentials = self.customer_number, self.username, self.password
-
         if query:
-            client = zeep.Client(self.wsdl_query)
-            result = client.service.Login_V1(*credentials)
+            result = self.call_service('Login_V1', True, *credentials)
         else:
-            client = zeep.Client(self.wsdl_create)
-            result = client.service.Login_Type1(*credentials)
-
-        result = zeep.helpers.serialize_object(result)
-
-        self._error_handler(result)
-
+            result = self.call_service('Login_Type1', False, *credentials)
         return uuid.UUID(result['SessionID'])
 
-    def CreateShipment_Type2(self, shipment_info:dict,
-                        return_label_link:bool = True,
-                        return_label_image:bool = True):
+    def CreateShipment_Type2(self, *args, **kwargs):
         """
         Create shipment with type 2
         """
+        return self.call_service('CreateShipment_Type2', False, *args, **kwargs)
 
-        shipment_info['SessionID'] = self.get_session_id()
-        shipment_info['ReturnLabelLink'] = return_label_link
-        shipment_info['ReturnLabelImage'] = return_label_image
-
-        # Request
-        client = zeep.Client(self.wsdl_create)
-        result = client.service.CreateShipment_Type2(**shipment_info)
-        result = zeep.helpers.serialize_object(result)
-
-        self._error_handler(result)
-
-        return result
-
-    def GetShipmentInfoByTrackingNumber_V2(self, tracking_number:str) -> OrderedDict:
+    def GetShipmentInfoByTrackingNumber_V2(self, *args, **kwargs) -> OrderedDict:
         """
         This method is used to query package information for all tracking \
         numbers in a shipment. Any tracking number in a shipment can be sent \
         as a parameter.
         """
-        session_id = self.get_session_id(True)
-        client = zeep.Client(self.wsdl_query)
-        result = client.service.GetShipmentInfoByTrackingNumber_V2(
-            session_id, 1, tracking_number)
-        result = zeep.helpers.serialize_object(result)[0]
+        return self.call_service('GetShipmentInfoByTrackingNumber_V2', True, *args, **kwargs)
 
-        self._error_handler(result)
-
-        return result
-
-    def GetLastTransactionByTrackingNumber_V1(self, tracking_number:str):
+    def GetLastTransactionByTrackingNumber_V1(self, *args, **kwargs):
         """
         This method return only the last transaction for a tracking number
         """
-        session_id = self.get_session_id(True)
-        client = zeep.Client(self.wsdl_query)
-        result = client.service.GetLastTransactionByTrackingNumber_V1(
-            session_id, 1, tracking_number)
-        result = zeep.helpers.serialize_object(result)[0]
+        return self.call_service('GetLastTransactionByTrackingNumber_V1', True, *args, **kwargs)
 
-        self._error_handler(result)
-
-        return result
-
-    def GetTransactionsByTrackingNumber_V1(self, tracking_number:str):
+    def GetTransactionsByTrackingNumber_V1(self, *args, **kwargs):
         """
         This method return only the last transaction for a tracking number
         """
-        session_id = self.get_session_id(True)
-        client = zeep.Client(self.wsdl_query)
-        result = client.service.GetTransactionsByTrackingNumber_V1(
-            session_id, 1, tracking_number)
-        result = zeep.helpers.serialize_object(result)
+        return self.call_service('GetTransactionsByTrackingNumber_V1', True, *args, **kwargs)
 
-        self._error_handler(result)
-
-        return result
-
-    def GetUnreadTransactionsByTrackingNumber_V1(self,
-                                                 tracking_number:str,
-                                                 record_id:str):
+    def GetUnreadTransactionsByTrackingNumber_V1(self, *args, **kwargs):
         """
         This method return all transactions with RecordIds greater than the 
         RecordId supplied as a parameter. RecordIds are returned as part of 
         transaction information.
         """
-        session_id = self.get_session_id(True)
-        client = zeep.Client(self.wsdl_query)
-        result = client.service.GetUnreadTransactionsByTrackingNumber_V1(
-            session_id, 1, tracking_number, record_id)
-        result = zeep.helpers.serialize_object(result)
+        return self.call_service('GetUnreadTransactionsByTrackingNumber_V1', True, *args, **kwargs)
 
-        self._error_handler(result)
-
-        return result
-
-    def GetTransactionsByList_V2(self, veri):
+    def GetTransactionsByList_V2(self, *args, **kwargs):
         """
         This method returns requested transactions by provided list. \
         List can be customer referance number and tracking number. \
         Referance type must be set. Results can be set as last transaction, \
         all transaction and delivery transaction.
         """
-        veri['SessionID'] = self.get_session_id(True)
-
-        client = zeep.Client(self.wsdl_query)
-        result = client.service.GetTransactionsByList_V2(veri)
-        result = zeep.helpers.serialize_object(result)
-
-        # self._error_handler(result)
-
-        return result
+        return self.call_service('GetTransactionsByList_V2', True, *args, **kwargs)
