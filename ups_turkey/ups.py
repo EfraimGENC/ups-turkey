@@ -134,12 +134,20 @@ class UPSService:
 
     def GetShipmentInfoByTrackingNumber_V2(self, *args, **kwargs):
         """
-        This method is used to query package information for all tracking \
-        numbers in a shipment. Any tracking number in a shipment can be sent \
+        This method is used to query package information for all tracking 
+        numbers in a shipment. Any tracking number in a shipment can be sent 
         as a parameter.
         """
         return self.call_service(
             'GetShipmentInfoByTrackingNumber_V2', True, *args, **kwargs)
+
+    def GetPackageInfoByTrackingNumber_V1(self, *args, **kwargs):
+        """
+        This method is used to query package information by tracking number.
+        Parameters: `SessionID`, `InformationLevel`, `TrackingNumber`
+        """
+        return self.call_service(
+            'GetPackageInfoByTrackingNumber_V1', True, *args, **kwargs)
 
     def GetLastTransactionByTrackingNumber_V1(self, *args, **kwargs):
         """
@@ -166,10 +174,21 @@ class UPSService:
 
     def GetTransactionsByList_V2(self, *args, **kwargs):
         """
-        This method returns requested transactions by provided list. \
-        List can be customer referance number and tracking number. \
-        Referance type must be set. Results can be set as last transaction, \
+        This method returns requested transactions by provided list. 
+        List can be customer referance number and tracking number. 
+        Referance type must be set. Results can be set as last transaction, 
         all transaction and delivery transaction.
         """
         return self.call_service(
             'GetTransactionsByList_V2', True, *args, **kwargs)
+
+    def GetPackageInfoByDatePeriod_V1(self, *args, **kwargs):
+        """
+        This method is used to query all of the packages information, 
+        under an account number, in a given date period. As SessionId 
+        obtained through Login is specific to a customer account number, 
+        account number is not needed as a parameter.
+        Parameters: `SessionID`, `InformationLevel`, `Startdate`, `EndDate`
+        """
+        return self.call_service(
+            'GetPackageInfoByDatePeriod_V1', True, *args, **kwargs)
