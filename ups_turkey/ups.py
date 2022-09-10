@@ -23,7 +23,7 @@ class Result:
         return str(self._data)
 
     def __repr__(self) -> str:
-        return self._data
+        return self.__str__()
 
     def __getitem__(self, key):
         return self._data[key]
@@ -46,35 +46,7 @@ class Result:
         return dict(self._data)
 
 
-class Results:
-    def __init__(self, service:str, data:list, raise_exception:bool):
-        if not isinstance(data, list):
-            raise TypeError('Data must be list!')
-        self._service = service
-        self._data = data
-        self._re = raise_exception
-        self._count = len(data)
-        self._index = 0
-        self.results = []
-        for r in self._data:
-            self.results.append(Result(self._service, r, self._re))
-
-    def __str__(self) -> str:
-        return str(self.results)
-
-    def __repr__(self) -> str:
-        return self.results
-
-    def __iter__(self):
-        for result in self.results:
-            yield result
-
-    def __len__(self):
-        return self._count
-
-    def __getitem__(self, i):
-        return self.results[i]
-
+class ResultList(list):
     @property
     def has_fail(self):
         for r in self:
@@ -112,7 +84,11 @@ class UPSService:
             return Result(service, result, raise_exception)
         if len(result) == 1:
             return Result(service, result[0], raise_exception)
-        return Results(service, result, raise_exception)
+
+        result_list = ResultList()
+        for r in result:
+            result_list.append(Result(service, r, raise_exception))
+        return result_list
 
 
     def get_session_id(self, query=False):
