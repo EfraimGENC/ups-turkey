@@ -4,11 +4,13 @@ import zeep
 from typing import OrderedDict, Tuple
 from collections.abc import Iterable
 from ups_turkey.exceptions import UPSException
-from ups_turkey.encoders import DecimalEncoder
+from ups_turkey.helpers import to_json
 
 
 class Result:
     def __init__(self, service:str, data:OrderedDict, raise_exception=False):
+        if not isinstance(data, dict):
+            raise TypeError('Data must be dict or OrderedDict!')
         self._service = service
         self._data = data
         self._raise_exception = raise_exception
@@ -21,7 +23,7 @@ class Result:
         return str(self._data)
 
     def __repr__(self) -> str:
-        return self.__str__()
+        return self._data
 
     def __getitem__(self, key):
         return self._data[key]
@@ -34,11 +36,11 @@ class Result:
     def data(self) -> OrderedDict:
         return self._data
 
-    def get_error(self) -> Tuple[str, str]:
-        return self._error_code, self._error_definition
+    def get_error(self) -> Tuple[int, str]:
+        return int(self._error_code), self._error_definition
 
     def json(self):
-        return json.dumps(self._data, ensure_ascii=False, cls=DecimalEncoder)
+        return to_json(self._data)
 
     def dict(self):
         return dict(self._data)
@@ -46,8 +48,8 @@ class Result:
 
 class Results:
     def __init__(self, service:str, data:list, raise_exception:bool):
-        if not isinstance(data, Iterable):
-            raise TypeError('Data must be iterable!')
+        if not isinstance(data, list):
+            raise TypeError('Data must be list!')
         self._service = service
         self._data = data
         self._re = raise_exception
@@ -81,7 +83,7 @@ class Results:
         return False
 
     def json(self):
-        return json.dumps(self._data, ensure_ascii=False, cls=DecimalEncoder)
+        return to_json(self._data)
 
 
 class UPSService:
