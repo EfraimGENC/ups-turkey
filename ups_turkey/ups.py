@@ -54,24 +54,25 @@ class UPSService:
 
         result = getattr(client.service, service)(*args, **kwargs)
         result = zeep.helpers.serialize_object(result)
-
-        if isinstance(result, dict):
-            return Result(result)
-        if len(result) == 1:
-            return Result(result[0])
+        result = result if isinstance(result, list) else [result]
 
         result_list = ResultList()
         for r in result:
             result_list.append(Result(r))
         return result_list
 
-
-    def get_session_id(self, query=False):
+    def login(self, query=False):
         credentials = self.customer_number, self.username, self.password
         if query:
-            result = self.call_service('Login_V1', True, *credentials)
+            result = self.call_service('Login_V1', True, *credentials)[0]
         else:
-            result = self.call_service('Login_Type1', False, *credentials)
+            result = self.call_service('Login_Type1', False, *credentials)[0]
+        error = result.get('ErrorCode'), result.get('ErrorDefinition')
+        if error[0]: raise UPSException(*error)
+        return result
+
+    def get_session_id(self, query=False):
+        result = self.login(query)
         return uuid.UUID(result['SessionID'])
 
     # Creation Services #######################################################

@@ -3,24 +3,98 @@
 # UPS Turkey
 Python package for integrate UPS Turkey easily.
 
-[Createshipment V7](https://ws.ups.com.tr/wsCreateShipment/wsCreateShipment.asmx)
+UPS Türkiye yutriçi gönderileri için `ups.com/upsdeveloperkit`'ten ayrı bir sistem kullanmaktadır. `ups.com/upsdeveloperkit` sadece yurtdışı gönderile için kullanılmaktadır. UPS Türkiye'nin API'ları ise WebService (SOAP) ile çalışmaktadır. Bu hafif python pakedi, UPS Türkiye'nin web servisini kolayca kullanabilmenize olanak sağlar.
 
-[QueryPackageInfo](https://ws.ups.com.tr/QueryPackageInfo/wsQueryPackagesInfo.asmx)
+UPS Türkiye'nin oluşturma([Createshipment V7](https://ws.ups.com.tr/wsCreateShipment/wsCreateShipment.asmx)) ve sorgulama([QueryPackageInfo](https://ws.ups.com.tr/QueryPackageInfo/wsQueryPackagesInfo.asmx)) işlemleri için iki ayrı servisi bulunmaktadır.
 
-## Install
+---
+
+- [Installation](#Installation)
+- [Usage](#Usage)
+  - [Inıtilaize Service](#InıtilaizeService)
+    - [Service Helpers](#ServiceHelpers)
+  - [Operations](#Operations)
+    - [List](#List)
+    - [Parameter Dictionary](#ParameterDictionary)
+    - [Examples](#Examples)
+
+---
+
+## Installation <a name="Installation"></a>
 ```sh
 pip install ups-turkey
 ```
 
-## Usage
-### Create Shipment
+## Usage <a name="Usage"></a>
+### Inıtilaize Service <a name="InıtilaizeService"></a>
 ```python
 from ups_turkey import UPSService
 
-
 ups = UPSService('CUSTOMER_NUMBER', 'USERNAME', 'PASSWORD')
+```
+#### Service Helpers <a name="ServiceHelpers"></a>
+```python
+result = ups.ANY_OPERATIONS(**payload)
+```
+Operartions resturn list of dict as `ResultList[Result]`. ResultList and Result have some helpers like below.
+- `Result(dict)`
+  - Convert result to JSON: `result.json()`
+  - Convert result to dictionary: `result.dict()`
+  - Checks is result is have an error: `result.is_success()` returns bool.
+    If you want to raise `UPSException(ERROR_CODE, ERROR_DEFINATION)` pass `raise_exception=True` param like `result.is_success(raise_exception=True)`
+  - `result.get_error()` for getting result's error code and defination as tuple if has
+- `ResultList(list)`
+  - Convert result to JSON: `result.json()`
+  - Checks is any result in list is have an error: `result.has_fail()` returns bool.
+    If you want to raise `UPSException(ERROR_CODE, ERROR_DEFINATION)` pass `raise_exception=True` param like `result.has_fail(raise_exception=True)`
 
-shipment_info = {
+### Operations <a name="Operations"></a>
+#### List <a name="List"></a>
+- Create Service
+  - Cancel_Shipment_V1
+  - CreateShipment_Type1
+  - [CreateShipment_Type2](#CreateShipment_Type2)
+  - CreateShipment_Type2TRT
+  - CreateShipment_Type3
+  - CreateShipment_Type3_XML
+  - CreateShipment_Type3_ZPL
+  - CreateShipment_Type3_ZPL_Types
+  - CreateShipment_Type4
+  - CustomerShipmentLimitDetail
+  - OnDemandPickupRequest_Type1
+  - TransferShipmentList_Type1
+- Query Service
+  - GetLastTransactionByTrackingNumber_V1
+  - GetPackageInfoByDatePeriod_V1
+  - GetPackageInfoByReferance_V1
+  - GetPackageInfoByTrackingNumber_V1
+  - GetShipmentInfoByTrackingNumber_V1
+  - [GetShipmentInfoByTrackingNumber_V2](#GetShipmentInfoByTrackingNumber_V2)
+  - GetTiNTInformationByTrackingNumberList_V1
+  - GetTiNTInformationByTrackingNumber_V1
+  - GetTransactionsByCustomerCode_V1
+  - GetTransactionsByList_V1
+  - [GetTransactionsByList_V2](#GetTransactionsByList_V2)
+  - GetTransactionsByPackagePickupDate_V1
+  - [GetTransactionsByTrackingNumber_V1](#GetTransactionsByTrackingNumber_V1)
+  - GetUnreadTransactionsByTrackingNumber_V1
+
+#### Parameter Dictionary <a name="ParameterDictionary"></a>
+##### ExpenseCode
+Gönderici tarafından sağlanan gider kodu. Paketleri daha fazla sınıflandırmak için raporlamada kullanılır (genellikle maliyet ölçümü için).
+##### CityCode
+UPS tarafından tanımlıdır. Türkiye'deki şehirler için plaka numarası.
+##### ThirdPartyAccountNumber
+Navlun üçüncü bir şahıs tarafından ödeniyorsa, bu UPS müşteri hesap numarasıdır.
+##### IdControlFlag
+Gönderici kimlik teyidi ile teslimat talep ederse “1”, aksi takdirde “0”.
+##### PhonePrealertFlag
+Gönderici, alıcının teslimattan önce telefonla uyarılmasını talep ederse “1”, aksi halde “0”.
+
+#### Examples <a name="Examples"></a>
+##### CreateShipment_Type2 <a name="CreateShipment_Type2"></a>
+```python
+payload = {
     'ShipmentInfo': {
         # Gönderen
         'ShipperAccountNumber': 'CUSTOMER_NUMBER',
@@ -75,64 +149,32 @@ shipment_info = {
     'ReturnLabelImage': True
 }
 
-shipment = ups.CreateShipment_Type2(shipment_info, True, True)
+shipment = ups.CreateShipment_Type2(**payload)
 ```
 
-### Get Shipment Info By Tracking Number
+##### GetShipmentInfoByTrackingNumber_V2 <a name="GetShipmentInfoByTrackingNumber_V2"></a>
 ```python
-from ups_turkey import UPSService
-
-
-ups = UPSService('CUSTOMER_NUMBER', 'USERNAME', 'PASSWORD')
-
 payload = {
     'InformationLevel': 1,
     'TrackingNumber': 'YOUR_TRACKING_NUMBER'
 }
 
 result = ups.GetShipmentInfoByTrackingNumber_V2(**payload)
-
 ```
 
-You can convert to JSON if you like
+##### GetTransactionsByTrackingNumber_V1 <a name="GetTransactionsByTrackingNumber_V1"></a>
 ```python
-import json
-from decimal import Decimal
-
-# This for encode decimal values
-class DecimalEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, Decimal):
-            return float(obj)
-        return json.JSONEncoder.default(self, obj)
-
-print(json.dumps(result, ensure_ascii=False, cls=DecimalEncoder))
-```
-
-### Get Transactions By Tracking Number
-```python
-from ups_turkey import UPSService
-
-
-ups = UPSService('CUSTOMER_NUMBER', 'USERNAME', 'PASSWORD')
-
 payload = {
     'InformationLevel': 1,
-    'TrackingNumber': '1ZE3184E6800392064'
+    'TrackingNumber': 'YOUR_TRACKING_NUMBER'
 }
 
 result = ups.GetTransactionsByTrackingNumber_V1(**payload)
 ```
 
-### Get Transactions By List
+##### GetTransactionsByList_V2 <a name="GetTransactionsByList_V2"></a>
 ```python
-from ups_turkey import UPSService
-
-
-ups = UPSService('CUSTOMER_NUMBER', 'USERNAME', 'PASSWORD')
-
 payload = {
-    'SessionID': '',
     'InformationLevel': 1,
     'refList': {
         'referansType': 'WAYBILL_TYPE',
