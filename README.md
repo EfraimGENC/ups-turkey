@@ -1,3 +1,5 @@
+[![Build Status](https://img.shields.io/github/workflow/status/EfraimGENC/ups-turkey/Publish%20UPS%20Turkey%20distributions%20to%20PyPI%20and%20TestPyPI?logo=GitHub&label=build)](https://github.com/EfraimGENC/ups-turkey/actions) [![Made With](https://img.shields.io/badge/%3C%2F%3E-Python-blue)](/docs/requirements/) [![License](https://img.shields.io/badge/license-mit-blue.svg)](https://github.com/EfraimGENC/ups-turkey/blob/master/LICENSE.md) ![Latest Relase](https://img.shields.io/github/v/release/EfraimGENC/ups-turkey?sort=semver)
+
 # UPS Turkey
 Python package for integrate UPS Turkey easily.
 
