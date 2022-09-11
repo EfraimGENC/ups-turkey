@@ -7,50 +7,27 @@ from ups_turkey.exceptions import UPSException
 from ups_turkey.helpers import to_json
 
 
-class Result:
-    def __init__(self, service:str, data:OrderedDict, raise_exception=False):
-        if not isinstance(data, dict):
-            raise TypeError('Data must be dict or OrderedDict!')
-        self._service = service
-        self._data = data
-        self._raise_exception = raise_exception
-        self._error_code = data.get('ErrorCode')
-        self._error_definition = data.get('ErrorDefinition')
-        if self._raise_exception and self.error_code:
-            raise UPSException(self._error_code, self._error_definition)
+class Result(dict):
+    def is_success(self, raise_exception=False):
+        error = self.get_error()
+        if raise_exception and error[0]:
+            raise UPSException(*error)
+        return not bool(error[0])
 
-    def __str__(self) -> str:
-        return str(self._data)
-
-    def __repr__(self) -> str:
-        return self.__str__()
-
-    def __getitem__(self, key):
-        return self._data[key]
-
-    @property
-    def is_success(self):
-        return not bool(self._error_code)
-
-    @property
-    def data(self) -> OrderedDict:
-        return self._data
-
-    def get_error(self) -> Tuple[int, str]:
-        return int(self._error_code), self._error_definition
+    def get_error(self) -> Tuple[str, str]:
+        return self.get('ErrorCode'), self.get('ErrorDefinition')
 
     def json(self):
-        return to_json(self._data)
+        return to_json(self)
 
     def dict(self):
-        return dict(self._data)
+        return dict(self)
 
 
 class ResultList(list):
-    @property
-    def has_fail(self):
+    def has_fail(self, raise_exception=False):
         for r in self:
-            if not r.is_success:
+            if not r.is_success(raise_exception):
                 return True
         return False
 
@@ -81,13 +58,13 @@ class UPSService:
         result = zeep.helpers.serialize_object(result)
 
         if isinstance(result, dict):
-            return Result(service, result, raise_exception)
+            return Result(result)
         if len(result) == 1:
-            return Result(service, result[0], raise_exception)
+            return Result(result[0])
 
         result_list = ResultList()
         for r in result:
-            result_list.append(Result(service, r, raise_exception))
+            result_list.append(Result(r))
         return result_list
 
 
