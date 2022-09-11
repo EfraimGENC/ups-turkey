@@ -32,7 +32,7 @@ class ResultList(list):
         return False
 
     def json(self):
-        return to_json(self._data)
+        return to_json(self)
 
 
 class UPSService:
@@ -84,7 +84,56 @@ class UPSService:
         return self.call_service(
             'CreateShipment_Type2', False, *args, **kwargs)
 
+    def OnDemandPickupRequest_Type1(self, *args, **kwargs):
+        """
+        OnDemand Pickup Request Type 1
+        """
+        return self.call_service(
+            'OnDemandPickupRequest_Type1', False, *args, **kwargs)
+
+    def CustomerShipmentLimitDetail(self):
+        """
+        Customer Shipment LimitDetail
+        """
+        return self.call_service(
+            'CustomerShipmentLimitDetail', False)
+
     # Query Services ##########################################################
+
+    def GetLastTransactionByTrackingNumber_V1(self, *args, **kwargs):
+        """
+        This method return only the last transaction for a tracking number
+        """
+        return self.call_service(
+            'GetLastTransactionByTrackingNumber_V1', True, *args, **kwargs)
+
+    def GetPackageInfoByDatePeriod_V1(self, *args, **kwargs):
+        """
+        This method is used to query all of the packages information, 
+        under an account number, in a given date period. As SessionId 
+        obtained through Login is specific to a customer account number, 
+        account number is not needed as a parameter.
+        Parameters: `SessionID`, `InformationLevel`, `Startdate`, `EndDate`
+        """
+        return self.call_service(
+            'GetPackageInfoByDatePeriod_V1', True, *args, **kwargs)
+
+    def GetPackageInfoByTrackingNumber_V1(self, *args, **kwargs):
+        """
+        This method is used to query package information by tracking number.
+        Parameters: `SessionID`, `InformationLevel`, `TrackingNumber`
+        """
+        return self.call_service(
+            'GetPackageInfoByTrackingNumber_V1', True, *args, **kwargs)
+
+    def GetShipmentInfoByTrackingNumber_V1(self, *args, **kwargs):
+        """
+        This method is used to query package information for all tracking 
+        numbers in a shipment. Any tracking number in a shipment can be sent 
+        as a parameter.
+        """
+        return self.call_service(
+            'GetShipmentInfoByTrackingNumber_V1', True, *args, **kwargs)
 
     def GetShipmentInfoByTrackingNumber_V2(self, *args, **kwargs):
         """
@@ -95,20 +144,62 @@ class UPSService:
         return self.call_service(
             'GetShipmentInfoByTrackingNumber_V2', True, *args, **kwargs)
 
-    def GetPackageInfoByTrackingNumber_V1(self, *args, **kwargs):
+    def GetTiNTInformationByTrackingNumberList_V1(self, *args, **kwargs):
         """
-        This method is used to query package information by tracking number.
+        This method used to query time in transit information for a package.
+        Pickup date also included in dataset.
+        Parameters: `SessionID`, `InformationLevel`,
+        `TrackingNumberList[WaybillList[Waybill]]`
+        """
+        return self.call_service(
+            'GetTiNTInformationByTrackingNumberList_V1', True, *args, **kwargs)
+
+    def GetTiNTInformationByTrackingNumber_V1(self, *args, **kwargs):
+        """
+        This method used to query time in transit information for a package.
+        Pickup date also included in dataset.
         Parameters: `SessionID`, `InformationLevel`, `TrackingNumber`
         """
         return self.call_service(
-            'GetPackageInfoByTrackingNumber_V1', True, *args, **kwargs)
+            'GetTiNTInformationByTrackingNumber_V1', True, *args, **kwargs)
 
-    def GetLastTransactionByTrackingNumber_V1(self, *args, **kwargs):
+    def GetTransactionsByCustomerCode_V1(self, *args, **kwargs):
         """
-        This method return only the last transaction for a tracking number
+        Parameters: `SessionID`, `InformationLevel`, `RecordId`
         """
         return self.call_service(
-            'GetLastTransactionByTrackingNumber_V1', True, *args, **kwargs)
+            'GetTransactionsByCustomerCode_V1', True, *args, **kwargs)
+
+    def GetTransactionsByList_V1(self, *args, **kwargs):
+        """
+        This method returns requested transactions by provided list. 
+        List can be customer referance number and tracking number. 
+        Referance type must be set. Results can be set as last transaction, 
+        all transaction and delivery transaction.
+        """
+        return self.call_service(
+            'GetTransactionsByList_V1', True, *args, **kwargs)
+
+    def GetTransactionsByList_V2(self, *args, **kwargs):
+        """
+        This method returns requested transactions by provided list. 
+        List can be customer referance number and tracking number. 
+        Referance type must be set. Results can be set as last transaction, 
+        all transaction and delivery transaction.
+        """
+        return self.call_service(
+            'GetTransactionsByList_V2', True, *args, **kwargs)
+
+    def GetTransactionsByPackagePickupDate_V1(self, *args, **kwargs):
+        """
+        This method is used to query all of the packages transactions, 
+        under an account number, in a given date period. Results can be set 
+        as last transaction, all transaction and delivery transaction.
+        Parameters: `SessionID`, `InformationLevel`, `StartDate`, `EndDate`, 
+        `TransactionType`
+        """
+        return self.call_service(
+            'GetTransactionsByPackagePickupDate_V1', True, *args, **kwargs)
 
     def GetTransactionsByTrackingNumber_V1(self, *args, **kwargs):
         """
@@ -125,24 +216,3 @@ class UPSService:
         """
         return self.call_service(
             'GetUnreadTransactionsByTrackingNumber_V1', True, *args, **kwargs)
-
-    def GetTransactionsByList_V2(self, *args, **kwargs):
-        """
-        This method returns requested transactions by provided list. 
-        List can be customer referance number and tracking number. 
-        Referance type must be set. Results can be set as last transaction, 
-        all transaction and delivery transaction.
-        """
-        return self.call_service(
-            'GetTransactionsByList_V2', True, *args, **kwargs)
-
-    def GetPackageInfoByDatePeriod_V1(self, *args, **kwargs):
-        """
-        This method is used to query all of the packages information, 
-        under an account number, in a given date period. As SessionId 
-        obtained through Login is specific to a customer account number, 
-        account number is not needed as a parameter.
-        Parameters: `SessionID`, `InformationLevel`, `Startdate`, `EndDate`
-        """
-        return self.call_service(
-            'GetPackageInfoByDatePeriod_V1', True, *args, **kwargs)
