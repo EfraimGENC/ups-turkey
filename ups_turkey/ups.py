@@ -46,8 +46,6 @@ class UPSService:
         self.password = password
 
     def call_service(self, service:str, query=False, *args, **kwargs):
-        raise_exception = kwargs.pop('raise_exception', False)
-
         if not service.startswith('Login'):
             kwargs['SessionID'] = self.get_session_id(query)
 
