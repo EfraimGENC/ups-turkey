@@ -34,7 +34,9 @@ ups = UPSService('CUSTOMER_NUMBER', 'USERNAME', 'PASSWORD')
 ```
 #### Service Helpers <a name="ServiceHelpers"></a>
 ```python
-result = ups.ANY_OPERATIONS(**payload)
+result = ups.create(**payload) # for "Createshipment V7" service
+# or
+result = ups.query(**payload) # for "QueryPackageInfo" service
 ```
 Operartions resturn list of dict as `ResultList[Result]`. ResultList and Result have some helpers like below.
 - `Result(dict)`
@@ -71,7 +73,7 @@ Operartions resturn list of dict as `ResultList[Result]`. ResultList and Result 
   - GetShipmentInfoByTrackingNumber_V1
   - [GetShipmentInfoByTrackingNumber_V2](#GetShipmentInfoByTrackingNumber_V2)
   - GetTiNTInformationByTrackingNumberList_V1
-  - GetTiNTInformationByTrackingNumber_V1
+  - [GetTiNTInformationByTrackingNumber_V1](#GetTiNTInformationByTrackingNumber_V1)
   - GetTransactionsByCustomerCode_V1
   - GetTransactionsByList_V1
   - [GetTransactionsByList_V2](#GetTransactionsByList_V2)
@@ -149,7 +151,7 @@ payload = {
     'ReturnLabelImage': True
 }
 
-shipment = ups.CreateShipment_Type2(**payload)
+result = ups.create('CreateShipment_Type2', **payload)
 ```
 
 ##### GetShipmentInfoByTrackingNumber_V2 <a name="GetShipmentInfoByTrackingNumber_V2"></a>
@@ -158,8 +160,7 @@ payload = {
     'InformationLevel': 1,
     'TrackingNumber': 'YOUR_TRACKING_NUMBER'
 }
-
-result = ups.GetShipmentInfoByTrackingNumber_V2(**payload)
+result = ups.query('GetShipmentInfoByTrackingNumber_V2', **payload)
 ```
 
 ##### GetTransactionsByTrackingNumber_V1 <a name="GetTransactionsByTrackingNumber_V1"></a>
@@ -169,7 +170,7 @@ payload = {
     'TrackingNumber': 'YOUR_TRACKING_NUMBER'
 }
 
-result = ups.GetTransactionsByTrackingNumber_V1(**payload)
+result = ups.query('GetTransactionsByTrackingNumber_V1', **payload)
 ```
 
 ##### GetTransactionsByList_V2 <a name="GetTransactionsByList_V2"></a>
@@ -183,5 +184,14 @@ payload = {
     'trnType': 'ALL_TRANSACTIONS'
 }
 
-result = ups.GetTransactionsByList_V2(**payload)
+result = ups.query('GetTransactionsByList_V2', **payload)
+```
+
+##### GetTiNTInformationByTrackingNumber_V1 <a name="GetTiNTInformationByTrackingNumber_V1"></a>
+```python
+payload = {
+    'InformationLevel': 1,
+    'TrackingNumber': '1ZE3184E6800393143'
+}
+result = ups.query('GetTiNTInformationByTrackingNumber_V1', **payload)
 ```

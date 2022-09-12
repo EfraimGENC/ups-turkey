@@ -3,9 +3,11 @@ import setuptools
 with open('README.md', 'r') as f:
     long_description = f.read()
 
+version = '0.2.0'
+
 setuptools.setup(
     name="ups_turkey",
-    version="0.1.2",
+    version=version,
     author="Efraim GENC",
     author_email='info@kavimdigital.com',
     description="Easy integration for UPS Turkey",
@@ -15,7 +17,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url="https://github.com/EfraimGENC/ups-turkey",
-    download_url = 'https://github.com/EfraimGENC/ups-turkey/archive/refs/tags/v0.1.2.tar.gz',
+    download_url=f'https://github.com/EfraimGENC/ups-turkey/archive/refs/tags/v{version}.tar.gz',
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
