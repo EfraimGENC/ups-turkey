@@ -191,7 +191,7 @@ result = ups.query('GetTransactionsByList_V2', **payload)
 ```python
 payload = {
     'InformationLevel': 1,
-    'TrackingNumber': '1ZE3184E6800393143'
+    'TrackingNumber': 'YOUR_TRACKING_NUMBER'
 }
 result = ups.query('GetTiNTInformationByTrackingNumber_V1', **payload)
 ```

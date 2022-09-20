@@ -18,9 +18,6 @@ class Result(dict):
     def json(self):
         return to_json(self)
 
-    def dict(self):
-        return dict(self)
-
 
 class ResultList(list):
     def has_fail(self, raise_exception=False):
@@ -31,6 +28,9 @@ class ResultList(list):
 
     def json(self):
         return to_json(self)
+
+    def first(self):
+        return self[0]
 
 
 class UPSService:
@@ -73,8 +73,7 @@ class UPSService:
         credentials = self.customer_number, self.username, self.password
         login_opertaion = {'create': 'Login_Type1', 'query': 'Login_V1'}
         result = self._call(service, login_opertaion[service], *credentials)[0]
-        error = result.get('ErrorCode'), result.get('ErrorDefinition')
-        if error[0]: raise UPSException(*error)
+        result.is_success(raise_exception=True)
         return result
 
     def get_session_id(self, service:str):
